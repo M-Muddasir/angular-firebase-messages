@@ -32,14 +32,11 @@
               }
             ],
             "styles": [
+              "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
             "scripts": [],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "outputMode": "static"
           },
           "configurations": {
             "production": {
@@ -103,5 +100,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "b12f8ec0-a32c-4539-a844-55be4d1200cd"
   }
 }

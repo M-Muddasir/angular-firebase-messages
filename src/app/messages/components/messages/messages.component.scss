@@ -1,0 +1,29 @@
+.messages-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.messages-table {
+  width: 100%;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem 0;
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.54);
+}
