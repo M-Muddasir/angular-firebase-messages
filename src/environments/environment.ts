@@ -1,12 +1,12 @@
 export const environment = {
   production: false,
-  firebase: {
-    apiKey: "AIzaSyCfW79vQiUCayxKO0dwjPA27i31uz4mhzU",
-    authDomain: "upworkmessage-6169a.firebaseapp.com",
-    projectId: "upworkmessage-6169a",
-    storageBucket: "upworkmessage-6169a.appspot.com",
-    messagingSenderId: "186643882949",
-    appId: "1:186643882949:web:30ca56af1b2c45db8321ac",
-    measurementId: "G-S9QM8PRQ4C"
+  firebase : {
+    apiKey: "AIzaSyBvYvEqabXVUAxgcXSCg49UfwGndKARlNs",
+    authDomain: "upworkmessages.firebaseapp.com",
+    projectId: "upworkmessages",
+    storageBucket: "upworkmessages.firebasestorage.app",
+    messagingSenderId: "862901796780",
+    appId: "1:862901796780:web:39117d0a61446aef060409",
+    measurementId: "G-70LNVNSNVN"
   }
 };

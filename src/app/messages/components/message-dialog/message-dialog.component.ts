@@ -56,7 +56,6 @@ export class MessageDialogComponent implements OnDestroy {
       
       try {
         const messagesRef = collection(this.firestore, 'messages');
-        // Using a Promise chain instead of async/await to better work with Angular's change detection
         addDoc(messagesRef, messageWithDate)
           .then(() => {
             this.snackBar.open('Message sent successfully!', 'Close', { duration: 3000 });
