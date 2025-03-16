@@ -6,10 +6,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
-import { Firestore, collection, getDocs, query, orderBy, collectionData } from '@angular/fire/firestore';
-import { BehaviorSubject, Subscription, Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { Subscription, Observable } from 'rxjs';
 import { Message } from '../../models/message.model';
 import { MessageDialogComponent } from '../message-dialog/message-dialog.component';
+import { AppState } from '../../../store';
+import { MessagesActions } from '../../store/messages.actions';
+import { selectMessages, selectLoading, selectError } from '../../store/messages.selectors';
 
 @Component({
   selector: 'app-messages',
@@ -28,16 +31,21 @@ import { MessageDialogComponent } from '../message-dialog/message-dialog.compone
   styleUrls: ['./messages.component.scss']
 })
 export class MessagesComponent implements OnInit, OnDestroy {
-  messages$ = new BehaviorSubject<Message[]>([]);
-  loading$ = new BehaviorSubject<boolean>(false);
+  messages$: Observable<Message[]>;
+  loading$: Observable<boolean>;
+  error$: Observable<any>;
   displayedColumns: string[] = ['id', 'email', 'message', 'date'];
   private subscriptions = new Subscription();
   
   private dialog = inject(MatDialog);
-  private firestore = inject(Firestore);
+  private store = inject(Store<AppState>);
   private snackBar = inject(MatSnackBar);
   
-  constructor() {}
+  constructor() {
+    this.messages$ = this.store.select(selectMessages);
+    this.loading$ = this.store.select(selectLoading);
+    this.error$ = this.store.select(selectError);
+  }
   
   ngOnInit(): void {
     this.loadMessages();
@@ -48,36 +56,8 @@ export class MessagesComponent implements OnInit, OnDestroy {
   }
   
   loadMessages(): void {
-    try {
-      this.loading$.next(true);
-      const messagesRef = collection(this.firestore, 'messages');
-      const queryRef = query(messagesRef, orderBy('date', 'desc'));
-      
-      // Use collectionData to get an Observable instead of directly calling getDocs
-      collectionData(queryRef, { idField: 'id' }).subscribe({
-        next: (data: any[]) => {
-          const messages = data.map(item => {
-            return {
-              id: item.id,
-              email: item.email,
-              message: item.message,
-              date: item.date?.toDate ? item.date.toDate() : item.date
-            } as Message;
-          });
-          this.messages$.next(messages);
-          this.loading$.next(false);
-        },
-        error: (error) => {
-          console.error('Error loading messages', error);
-          this.snackBar.open('Error loading messages', 'Close', { duration: 3000 });
-          this.loading$.next(false);
-        }
-      });
-    } catch (error) {
-      console.error('Error setting up messages subscription', error);
-      this.snackBar.open('Error loading messages', 'Close', { duration: 3000 });
-      this.loading$.next(false);
-    }
+    // Dispatch the loadMessages action to trigger the effect
+    this.store.dispatch(MessagesActions.loadMessages());
   }
   
   openAddMessageDialog(): void {

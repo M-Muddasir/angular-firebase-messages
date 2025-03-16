@@ -8,8 +8,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
-import { Firestore, collection, addDoc, serverTimestamp } from '@angular/fire/firestore';
+import { Store } from '@ngrx/store';
 import { BehaviorSubject, Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
+
+import { Message } from '../../models/message.model';
+import { AppState } from '../../../store';
+import { MessagesActions } from '../../store/messages.actions';
+import { selectAddingMessage } from '../../store/messages.selectors';
 
 @Component({
   selector: 'app-message-dialog',
@@ -35,7 +41,7 @@ export class MessageDialogComponent implements OnDestroy {
   
   private fb = inject(FormBuilder);
   private dialogRef = inject(MatDialogRef<MessageDialogComponent>);
-  private firestore = inject(Firestore);
+  private store = inject(Store<AppState>);
   private snackBar = inject(MatSnackBar);
   
   constructor() {
@@ -43,36 +49,36 @@ export class MessageDialogComponent implements OnDestroy {
       email: ['', [Validators.required, Validators.email]],
       message: ['', Validators.required]
     });
+    
+    // Subscribe to the addingMessage state
+    const addingMessageSub = this.store.select(selectAddingMessage).subscribe(adding => {
+      this.isSubmitting$.next(adding);
+    });
+    
+    this.subscription.add(addingMessageSub);
   }
   
   submitForm(): void {
     if (this.messageForm.valid) {
-      this.isSubmitting$.next(true);
-      
-      const messageWithDate = {
-        ...this.messageForm.value,
-        date: serverTimestamp()
+      // Create a message object from the form values
+      const message: Message = {
+        id: '', // Will be set by Firebase
+        email: this.messageForm.value.email,
+        message: this.messageForm.value.message,
+        date: new Date() // Placeholder, will be replaced with serverTimestamp by the effect
       };
       
-      try {
-        const messagesRef = collection(this.firestore, 'messages');
-        addDoc(messagesRef, messageWithDate)
-          .then(() => {
-            this.snackBar.open('Message sent successfully!', 'Close', { duration: 3000 });
-            this.dialogRef.close();
-          })
-          .catch((error) => {
-            console.error('Error adding message', error);
-            this.snackBar.open('Error sending message', 'Close', { duration: 3000 });
-          })
-          .finally(() => {
-            this.isSubmitting$.next(false);
-          });
-      } catch (error) {
-        console.error('Error setting up message submission', error);
-        this.snackBar.open('Error sending message', 'Close', { duration: 3000 });
-        this.isSubmitting$.next(false);
-      }
+      // Dispatch the addMessage action
+      this.store.dispatch(MessagesActions.addMessage({ message }));
+      
+      // Set up a subscription to close the dialog when adding is complete
+      this.store.select(selectAddingMessage).pipe(
+        take(2) // Take the current value and the next value
+      ).subscribe(isAdding => {
+        if (!isAdding) {
+          this.dialogRef.close();
+        }
+      });
     }
   }
   

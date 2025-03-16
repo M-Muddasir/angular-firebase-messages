@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Firestore, collection, addDoc, serverTimestamp, getDocs, query, orderBy } from '@angular/fire/firestore';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -9,11 +9,11 @@ import { Message } from '../models/message.model';
 
 @Injectable()
 export class MessagesEffects {
-  constructor(
-    private actions$: Actions,
-    private firestore: Firestore,
-    private snackBar: MatSnackBar
-  ) {}
+  private actions$ = inject(Actions);
+  private firestore = inject(Firestore);
+  private snackBar = inject(MatSnackBar);
+  
+  constructor() {}
 
   loadMessages$ = createEffect(() =>
     this.actions$.pipe(
