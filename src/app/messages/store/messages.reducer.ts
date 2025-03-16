@@ -58,9 +58,4 @@ export const messagesReducer = createReducer(
   }))
 );
 
-// Selector functions
-export const getMessagesState = (state: any) => state.messages;
-export const getMessages = (state: any) => state.messages.messages;
-export const getLoading = (state: any) => state.messages.loading;
-export const getError = (state: any) => state.messages.error;
-export const getAddingMessage = (state: any) => state.messages.addingMessage;
+
